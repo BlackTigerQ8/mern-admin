@@ -45,7 +45,7 @@ const Sidebar = () => {
     //!important is because I'm overwritting css styles in the pro-sidebar library
     <Box
       sx={{
-        height: "100vh",
+        height: "140vh",
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
