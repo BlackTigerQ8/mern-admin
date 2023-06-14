@@ -1,16 +1,46 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Typography, Box, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
-import { mockDataTeam } from "../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../components/Header";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getUsersRequest,
+  getUsersSuccess,
+  getUsersFailure,
+} from "../redux/userSlice";
+import { getUsers } from "../redux/apiCalls";
+import Loader from "../components/Loader";
 
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.user.users);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        dispatch(getUsersRequest());
+        const fetchedUsers = await getUsers();
+
+        // Assign unique ids to each user object
+        const usersWithIds = fetchedUsers.map((user, index) => ({
+          ...user,
+          id: index + 1,
+        }));
+
+        dispatch(getUsersSuccess(usersWithIds));
+      } catch (error) {
+        dispatch(getUsersFailure(error));
+      }
+    };
+
+    fetchUsers();
+  }, [dispatch]);
 
   const columns = [
     {
@@ -18,7 +48,7 @@ const Team = () => {
       headerName: "ID",
     },
     {
-      field: "name",
+      field: "fullName",
       headerName: "Name",
       flex: 1,
       cellClassName: "name-column--cell",
@@ -29,23 +59,47 @@ const Team = () => {
       flex: 1,
     },
     {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
-    },
-    {
       field: "phone",
       headerName: "Phone Number",
       flex: 1,
     },
     {
-      field: "access",
+      field: "city",
+      headerName: "city",
+      type: "number",
+      headerAlign: "left",
+      align: "left",
+      flex: 1,
+    },
+    {
+      field: "accessLevel",
       headerName: "Access Level",
       flex: 1,
-      headerAlign: "center",
-      renderCell: ({ row: { access } }) => {
+      renderCell: ({ row }) => {
+        const { accessLevel } = row;
+
+        let icon;
+        let access;
+
+        switch (accessLevel) {
+          case 10:
+            icon = <AdminPanelSettingsOutlinedIcon />;
+            access = "Admin";
+            break;
+          case 20:
+            icon = <SecurityOutlinedIcon />;
+            access = "Manager";
+            break;
+          case 30:
+            icon = <LockOpenOutlinedIcon />;
+            access = "User";
+            break;
+          default:
+            icon = null;
+            access = "";
+            break;
+        }
+
         return (
           <Box
             width="60%"
@@ -53,15 +107,13 @@ const Team = () => {
             display="flex"
             justifyContent="center"
             backgroundColor={
-              access === "admin"
+              accessLevel === 30
                 ? colors.greenAccent[600]
                 : colors.greenAccent[700]
             }
             borderRadius="4px"
           >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {access === "manager" && <SecurityOutlinedIcon />}
-            {access === "user" && <LockOpenOutlinedIcon />}
+            {icon}
             <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
               {access}
             </Typography>
@@ -70,6 +122,20 @@ const Team = () => {
       },
     },
   ];
+
+  if (!users) {
+    // You can display a loading indicator or a message while users are being fetched
+    return (
+      <Box
+        height="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Loader />
+      </Box>
+    );
+  }
 
   return (
     <Box m="20px">
@@ -100,7 +166,7 @@ const Team = () => {
           },
         }}
       >
-        <DataGrid rows={mockDataTeam} columns={columns} />
+        <DataGrid rows={users} columns={columns} />
       </Box>
     </Box>
   );
