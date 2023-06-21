@@ -17,14 +17,15 @@ import Geography from "./scenes/Geography";
 import Calendar from "./scenes/Calendar";
 import Login from "./scenes/Login";
 import NotFound from "./scenes/NotFound";
+import Profile from "./scenes/Profile";
 import { useDispatch, useSelector } from "react-redux";
-import { checkAdminAccess } from "./redux/userSlice";
+import { checkAdminAccess, userRegisterSuccess } from "./redux/userSlice";
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  const isAdmin = useSelector((state) => state.user.isAdmin);
+  // const isAdmin = useSelector((state) => state.user.isAdmin);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -34,10 +35,53 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    const storedAuthStatus = localStorage.getItem("isAuthenticated");
+
+    if (storedAuthStatus) {
+      try {
+        const parsedAuthStatus = JSON.parse(storedAuthStatus);
+
+        if (!parsedAuthStatus && window.location.pathname !== "/login") {
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Error parsing stored authentication status:", error);
+      }
+    } else if (window.location.pathname !== "/login") {
       navigate("/login");
     }
-  }, [isAuthenticated, navigate]);
+  }, []); // Empty dependency array to run only once
+
+  useEffect(() => {
+    // Retrieve the user data from local storage
+    const storedUserData = localStorage.getItem("userData");
+
+    if (storedUserData) {
+      try {
+        const userData = JSON.parse(storedUserData);
+
+        // Dispatch the userRegisterSuccess action with the stored user data
+        dispatch(userRegisterSuccess(userData));
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+      }
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="app">
+          <Login />
+        </div>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -59,7 +103,7 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/geography" element={<Geography />} />
               <Route path="/calendar" element={<Calendar />} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

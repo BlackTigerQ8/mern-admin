@@ -3,7 +3,12 @@ import { registerUser } from "./apiCalls";
 
 // Define initial state
 const initialState = {
-  user: [],
+  user: {
+    firstName: "",
+    lastName: "",
+    accessLevel: null,
+    profileImage: null,
+  },
   loading: false,
   error: null,
   isAuthenticated: false,
@@ -19,7 +24,12 @@ const userSlice = createSlice({
     },
     userLoginSuccess: (state, action) => {
       state.loading = false;
-      state.user = action.payload;
+      state.user = {
+        ...action.payload,
+        accessLevel: action.payload.accessLevel,
+        firstName: action.payload.firstName,
+        lastName: action.payload.lastName,
+      };
       state.error = null;
       state.isAuthenticated = true;
     },
@@ -33,7 +43,12 @@ const userSlice = createSlice({
     },
     userRegisterSuccess: (state, action) => {
       state.loading = false;
-      state.user = action.payload;
+      state.user = {
+        ...action.payload,
+        accessLevel: action.payload.accessLevel,
+        firstName: action.payload.firstName,
+        lastName: action.payload.lastName,
+      };
       state.error = null;
     },
     userRegisterFailure: (state, action) => {
@@ -66,6 +81,9 @@ const userSlice = createSlice({
     userProfileUpdateFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    },
+    updateProfileImage: (state, action) => {
+      state.user.profileImage = action.payload;
     },
     getUsersRequest: (state) => {
       state.loading = true;
@@ -115,6 +133,7 @@ export const {
   userProfileUpdateRequest,
   userProfileUpdateSuccess,
   userProfileUpdateFailure,
+  updateProfileImage,
   getUsersRequest,
   getUsersSuccess,
   getUsersFailure,

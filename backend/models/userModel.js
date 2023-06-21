@@ -40,6 +40,9 @@ const userSchema = mongoose.Schema(
         message: "Postal code should not contain a comma",
       },
     },
+    profileImage: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
@@ -82,6 +85,11 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
+// Update profile image path
+userSchema.methods.updateProfileImage = function (imagePath) {
+  this.profileImage = imagePath;
+};
 
 const User = mongoose.model("User", userSchema);
 

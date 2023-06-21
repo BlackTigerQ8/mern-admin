@@ -48,6 +48,15 @@ export const updateUserProfile = async (userData) => {
   }
 };
 
+export const uploadImage = async (imageData) => {
+  try {
+    const response = await axios.post("/api/upload", imageData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data.message;
+  }
+};
+
 export const getUsers = async () => {
   try {
     const response = await axios.get(`${USERS_URL}`);

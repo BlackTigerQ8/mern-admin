@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, IconButton, Menu, MenuItem, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useContext } from "react";
 import InputBase from "@mui/material/InputBase";
@@ -19,16 +19,25 @@ const Topbar = () => {
   const colorMode = useContext(ColorModeContext);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const user = useSelector((state) => state.user.user);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
+  const [settingsMenuAnchorEl, setSettingsMenuAnchorEl] = useState(null);
 
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleOpenUserMenu = (event) => {
+    setUserMenuAnchorEl(event.currentTarget);
   };
 
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
+  const handleCloseUserMenu = () => {
+    setUserMenuAnchorEl(null);
+  };
+
+  const handleOpenSettingsMenu = (event) => {
+    setSettingsMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseSettingsMenu = () => {
+    setSettingsMenuAnchorEl(null);
   };
 
   const handleLogout = () => {
@@ -38,15 +47,15 @@ const Topbar = () => {
     // Remove the user information from localStorage
     localStorage.removeItem("user");
 
-    // Refresh the page
-    window.location.reload();
-
     // Redirect to the login page
     navigate("/login");
+
+    // Refresh the page
+    window.location.reload();
   };
 
   const handleLogin = () => {
-    if (!isAuthenticated) {
+    if (!user) {
       navigate("/login");
     }
   };
@@ -77,18 +86,13 @@ const Topbar = () => {
         <IconButton>
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={handleOpenSettingsMenu}>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton onClick={handleOpenMenu}>
-          {" "}
-          {/* Open menu on click */}
-          <PersonOutlinedIcon />
-        </IconButton>
         <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleCloseMenu}
+          anchorEl={settingsMenuAnchorEl}
+          open={Boolean(settingsMenuAnchorEl)}
+          onClose={handleCloseSettingsMenu}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "right",
@@ -98,7 +102,30 @@ const Topbar = () => {
             horizontal: "right",
           }}
         >
-          {isAuthenticated ? (
+          <Link
+            to="/profile"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <MenuItem>Profile</MenuItem>
+          </Link>
+        </Menu>
+        <IconButton onClick={handleOpenUserMenu}>
+          <PersonOutlinedIcon />
+        </IconButton>
+        <Menu
+          anchorEl={userMenuAnchorEl}
+          open={Boolean(userMenuAnchorEl)}
+          onClose={handleCloseUserMenu}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          {user ? (
             <>
               {user && <MenuItem>{user.fullName}</MenuItem>}
               <MenuItem onClick={handleLogout}>Logout</MenuItem>

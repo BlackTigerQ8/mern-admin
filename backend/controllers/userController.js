@@ -112,6 +112,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @route   PUT /api/users/profile
 // @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
+  const { firstName, email, password } = req.body;
   const user = await User.findById(req.user._id);
 
   if (user) {
@@ -122,12 +123,17 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       user.password = req.body.password;
     }
 
+    if (req.file) {
+      user.profileImage = req.file.path;
+    }
+
     const updatedUser = await user.save();
 
     res.json({
       _id: updatedUser._id,
       firstName: updatedUser.firstName,
       email: updatedUser.email,
+      profileImage: updatedUser.profileImage,
     });
   } else {
     res.status(404);

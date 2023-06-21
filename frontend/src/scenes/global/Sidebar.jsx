@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography, useTheme, Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
-import ProfileImage from "../../assets/aa1.png";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
@@ -17,6 +17,9 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { useSelector } from "react-redux";
+import { updateProfileImage } from "../../redux/userSlice";
+import { updateUserProfile } from "../../redux/apiCalls";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -41,6 +44,26 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+
+  const dispatch = useDispatch();
+
+  // Get user information from Redux state
+  const accessLevel = useSelector((state) => state.user.accessLevel);
+  const { user } = useSelector((state) => state.user);
+
+  const profileImage = user && user.profileImage;
+
+  const accessLevelOptions = [
+    { label: "Admin", value: 10 },
+    { label: "Manager", value: 20 },
+    { label: "User", value: 30 },
+  ];
+
+  useEffect(() => {
+    // Update the profile image when it changes
+    dispatch(updateProfileImage(user.profileImage));
+  }, [dispatch, user.profileImage]);
+
   return (
     //!important is because I'm overwritting css styles in the pro-sidebar library
     <Box
@@ -98,8 +121,12 @@ const Sidebar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={ProfileImage}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                  src={profileImage}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: "50%",
+                    border: "1px solid #fff",
+                  }}
                 />
               </Box>
               <Box textAlign="center">
@@ -109,12 +136,14 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Abdullah
+                  {user.firstName}
                   <br />
-                  Alenezi
+                  {user.lastName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Admin
+                  {accessLevelOptions.find(
+                    (option) => option.value === accessLevel
+                  )?.label || "User"}
                 </Typography>
               </Box>
             </Box>
@@ -218,6 +247,13 @@ const Sidebar = () => {
             <Item
               title="Geography Chart"
               to="/geography"
+              icon={<MapOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Geography Chart"
+              to="/landing-page"
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

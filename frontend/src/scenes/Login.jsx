@@ -89,7 +89,7 @@ const Login = () => {
   }, [dispatch]);
 
   return (
-    <Box m="20px">
+    <Box display="flex" flexDirection="column" justifyContent="center" m="30%">
       <Header title="LOGIN" subtitle="Login to Your Account" />
 
       <Formik
@@ -126,7 +126,7 @@ const Login = () => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 12" }}
               />
               <TextField
                 fullWidth
@@ -139,7 +139,7 @@ const Login = () => {
                 name="password"
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 12" }}
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">

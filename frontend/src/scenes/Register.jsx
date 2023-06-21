@@ -62,9 +62,15 @@ const Register = () => {
       values.accessLevel = accessLevelOptions.find(
         (option) => option.label === values.accessLevel
       ).value;
-      await dispatch(registerUser(values));
+
+      const response = await dispatch(registerUser(values));
+      const userData = response.payload;
       dispatch(userRegisterSuccess(values)); // Dispatch userRegisterSuccess action with the form values
       // Handle successful registration
+
+      // Persist the user data in local storage
+      localStorage.setItem("userData", JSON.stringify(userData));
+      dispatch(userRegisterSuccess(userData));
     } catch (error) {
       dispatch(userRegisterFailure(error.message));
 
@@ -107,7 +113,7 @@ const Register = () => {
             <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
             >
               <TextField
                 fullWidth
@@ -118,6 +124,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.firstName}
                 name="firstName"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.firstName && !!errors.firstName}
                 helperText={touched.firstName && errors.firstName}
               />
@@ -130,6 +137,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.lastName}
                 name="lastName"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.lastName && !!errors.lastName}
                 helperText={touched.lastName && errors.lastName}
               />
@@ -142,6 +150,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.email}
                 name="email"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
               />
@@ -154,6 +163,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.phone}
                 name="phone"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.phone && !!errors.phone}
                 helperText={touched.phone && errors.phone}
               />
@@ -166,6 +176,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.address}
                 name="address"
+                sx={{ gridColumn: "span 4" }}
                 error={!!touched.address && !!errors.address}
                 helperText={touched.address && errors.address}
               />
@@ -178,6 +189,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.city}
                 name="city"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.city && !!errors.city}
                 helperText={touched.city && errors.city}
               />
@@ -190,6 +202,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.postalCode}
                 name="postalCode"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.postalCode && !!errors.postalCode}
                 helperText={touched.postalCode && errors.postalCode}
               />
@@ -202,6 +215,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.password}
                 name="password"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
               />
@@ -214,6 +228,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.confirmPassword}
                 name="confirmPassword"
+                sx={{ gridColumn: "span 2" }}
                 error={!!touched.confirmPassword && !!errors.confirmPassword}
                 helperText={touched.confirmPassword && errors.confirmPassword}
               />
@@ -226,6 +241,7 @@ const Register = () => {
                 onChange={handleChange}
                 value={values.accessLevel}
                 name="accessLevel"
+                sx={{ gridColumn: "span 4" }}
                 error={!!touched.accessLevel && !!errors.accessLevel}
                 helperText={touched.accessLevel && errors.accessLevel}
               >
